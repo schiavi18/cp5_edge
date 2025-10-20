@@ -1,6 +1,9 @@
 # Sensor IoT FIWARE + ESP32 + Wokwi
 
-**👉 LINK DO CÓDIGO ->** [Click aqui para acessar ao código ](https://github.com/schiavi18/cp5_edge/commit/d7f5d3707703f91cc064195014e5e70691a2e2bc)
+**👉 LINK DO CÓDIGO ->** [Click aqui para acessar ao código. ](https://github.com/schiavi18/cp5_edge/commit/d7f5d3707703f91cc064195014e5e70691a2e2bc)
+
+**👉 LINK Wokwi ->** [Click aqui para acessar a simulação. ](https://wokwi.com/projects/445291835075421185) 
+
 
 ## 💡 Descrição do Projeto
 

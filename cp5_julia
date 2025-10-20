@@ -75,6 +75,7 @@ void loop() {
     }
 
     // --- JSON para atualização ---
+    /*Projeto desenvolvido exclusivamente por Julia Schiavi*/
     String json = "{";
     json += "\"temperatura\": {\"value\": " + String(temperatura, 2) + "},";
     json += "\"umidade\": {\"value\": " + String(umidade, 2) + "},";
@@ -111,3 +112,5 @@ void loop() {
 
   delay(5000); 
 }
+
+/*Projeto desenvolvido exclusivamente por Julia Schiavi*/
