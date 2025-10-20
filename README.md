@@ -12,7 +12,7 @@ O dispositivo coleta dados de temperatura, umidade, luminosidade e nível de ala
 
 - Conexão do Wokwi com PostMan.
 
-![Wokwi conectando com POSTMAN](image.png)
+![alt text](image-2.png)
 
 - Postman conectado.
 
