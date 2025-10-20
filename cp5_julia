@@ -1,9 +1,9 @@
-/* Julia Schiavi*/
-
+/* Julia Schiavi - Sensor IoT FIWARE + ESP32 + Wokwi */
 
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <DHT.h>
+
 
 #define DHTPIN 15
 #define DHTTYPE DHT11
@@ -15,25 +15,39 @@ DHT dht(DHTPIN, DHTTYPE);
 
 const char* ssid = "Wokwi-GUEST";
 const char* password = "";
+
+
 const char* fiware_server = "http://54.175.205.8:1026/v2/entities";
-const char* device_id = "lamp003"; 
+const char* device_id = "lamp003";
 const char* service = "openiot";
 const char* service_path = "/";
+
 
 void setup() {
   Serial.begin(115200);
   dht.begin();
+
   pinMode(LDR_PIN, INPUT);
   pinMode(TRIG_PIN, OUTPUT);
   pinMode(ECHO_PIN, INPUT);
 
+  Serial.println("Conectando ao Wi-Fi...");
   WiFi.begin(ssid, password);
-  Serial.print("Conectando ao Wi-Fi");
-  while (WiFi.status() != WL_CONNECTED) {
+
+  int tentativas = 0;
+  while (WiFi.status() != WL_CONNECTED && tentativas < 20) {
     delay(500);
     Serial.print(".");
+    tentativas++;
   }
-  Serial.println("\nWi-Fi conectado!");
+
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("\n Wi-Fi conectado com sucesso!");
+    Serial.print("Endereço IP: ");
+    Serial.println(WiFi.localIP());
+  } else {
+    Serial.println("\n Falha ao conectar no Wi-Fi!");
+  }
 }
 
 float medirDistancia() {
@@ -55,24 +69,25 @@ void loop() {
     String alagamento = (distancia < 10.0) ? "ALERTA" : "NORMAL";
 
     if (isnan(temperatura) || isnan(umidade)) {
-      Serial.println("Erro ao ler o DHT11");
+      Serial.println(" Erro ao ler o sensor DHT11");
       delay(2000);
       return;
     }
 
-    // --- JSON de atualização FIWARE ---
-    String json = String("{") +
-      "\"temperatura\": {\"value\": " + String(temperatura, 2) + "}," +
-      "\"umidade\": {\"value\": " + String(umidade, 2) + "}," +
-      "\"luminosidade\": {\"value\": " + String(luminosidade) + "}," +
-      "\"alagamento\": {\"value\": \"" + alagamento + "\"}" +
-      "}";
+    // --- JSON para atualização ---
+    String json = "{";
+    json += "\"temperatura\": {\"value\": " + String(temperatura, 2) + "},";
+    json += "\"umidade\": {\"value\": " + String(umidade, 2) + "},";
+    json += "\"luminosidade\": {\"value\": " + String(luminosidade) + "},";
+    json += "\"alagamento\": {\"value\": \"" + alagamento + "\"}";
+    json += "}";
+
+    String url = String(fiware_server) + "/" + device_id + "/attrs";
+    Serial.println("\n📡 Enviando para: " + url);
+    Serial.println(" Corpo JSON: " + json);
 
     HTTPClient http;
-    String url = String(fiware_server) + "/" + device_id + "/attrs";
-    Serial.println("Enviando para: " + url);
     http.begin(url);
-
     http.addHeader("Content-Type", "application/json");
     http.addHeader("Fiware-Service", service);
     http.addHeader("Fiware-ServicePath", service_path);
@@ -80,16 +95,19 @@ void loop() {
     int httpCode = http.POST(json);
 
     if (httpCode > 0) {
-      Serial.printf("Código HTTP: %d\n", httpCode);
-      Serial.println(http.getString());
+      Serial.printf(" Código HTTP: %d\n", httpCode);
+      String payload = http.getString();
+      if (payload.length() > 0) {
+        Serial.println(" Resposta do servidor: " + payload);
+      }
     } else {
-      Serial.printf("Erro no envio! Código HTTP: %d\n", httpCode);
+      Serial.printf(" Erro no envio! Código: %d\n", httpCode);
     }
 
     http.end();
   } else {
-    Serial.println("Wi-Fi desconectado!");
+    Serial.println(" Wi-Fi desconectado!");
   }
 
-  delay(5000);
+  delay(5000); 
 }
