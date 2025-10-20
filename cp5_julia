@@ -112,5 +112,4 @@ void loop() {
 
   delay(5000); 
 }
-
 /*Projeto desenvolvido exclusivamente por Julia Schiavi*/
